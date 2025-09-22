@@ -1,75 +1,51 @@
-# Nuxt Minimal Starter
+# Nuxt版購物網站
+    這次預計壓縮至一個禮拜完成，目前處於規劃階段
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## 目前架構
+- 前端
+  - Nuxt製作
+  - typeScript為主
+  - i18n 製作多語言系統
+- 後端
+  - Firebase資料庫
 
-## Setup
+## 預計會包含有(構思補足中)
+- 首頁
+  - 產品推薦
+  - 熱銷產品
+  - 限時則扣(這部分可能配合後端會做成固定時間出現)
 
-Make sure to install dependencies:
+- 搜尋頁面
+  - 可篩選產品與預覽模式
 
-```bash
-# npm
-npm install
+- 產品頁面
+  - 產品圖片
+  - 產品購買數量
+  - 產品價格
+  - 產品評價
+  - 產品介紹(預計以markDown架構)
+  - 產品剩餘數量
 
-# pnpm
-pnpm install
+- 會員資訊
+  - ID(key)
+  - 使用者暱稱
+  - 修改密碼(需二度確認)
+  - 近期看過商品(暫定限制記憶20項)
+  - 購買紀錄(需對應每一筆資料的ID)
+  - 仿商品進度
+  - 刪除帳號(需二度確認)
 
-# yarn
-yarn install
+- 購物車
+  - 購買產品的數量 價格
 
-# bun
-bun install
-```
+- 訪購物結算畫面
 
-## Development Server
+- 購物完成畫面
 
-Start the development server on `http://localhost:3000`:
+- 後臺管理(管理者限定)
 
-```bash
-# npm
-npm run dev
+  - 商品管理
 
-# pnpm
-pnpm dev
+  - 會員管理
 
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+  
