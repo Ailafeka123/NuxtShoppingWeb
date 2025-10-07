@@ -1,0 +1,22 @@
+:root{
+    --background:#ffffff;
+    --textColor:black;
+
+
+
+    --menuHeight:80px;
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+li{
+  list-style-type: none;  
+}
+main{
+    margin-top: var(--menuHeight);
+    height: 100svh;
+    padding: 32px 0 0 0 ;
+}
