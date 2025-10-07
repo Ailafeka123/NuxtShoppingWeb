@@ -1,7 +1,7 @@
-<script setup lang="ts" nonce="aila">
+<script setup lang="ts" >
 </script>
 
-<style module="style" lang="scss" nonce="aila">
+<style module="style" lang="scss" >
     .footer{
         box-sizing: border-box;
         display: flex;

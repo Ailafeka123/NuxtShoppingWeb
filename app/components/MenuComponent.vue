@@ -1,7 +1,7 @@
-<script lang="ts" setup nonce="aila">
+<script lang="ts" setup >
 
 </script>
-<style lang="scss" module="style" nonce="aila">
+<style lang="scss" module="style" >
     .header{
         display: flex;
         flex-direction: row;

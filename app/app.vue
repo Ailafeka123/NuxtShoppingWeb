@@ -1,4 +1,4 @@
-<script setup lang="ts" nonce="aila">
+<script setup lang="ts">
   import { ref , onMounted } from 'vue';
   const iconString = ref<string>(`/selficon/selficon.svg`)
 
@@ -13,17 +13,17 @@
       { property: 'og:title', content: 'Aila-購物網站' },
       { property: 'og:description', content: '自製的購物網站，採用Nuxt配合Vercel進行部屬。' },
       { property: 'og:type', content: 'website' },
-      {
-        'http-equiv': 'Content-Security-Policy',
-        content: `
-          default-src 'self';
-          script-src 'self' 'nonce-aila' https://www.gstatic.com ;
-          style-src 'self' 'nonce-aila';
-          img-src 'self' data:;
-          connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000;
-          frame-src ;
-        `.replace(/\s{2,}/g, ' ').trim()
-      }
+      // {
+      //   'http-equiv': 'Content-Security-Policy',
+      //   content: `
+      //     default-src 'self';
+      //     script-src 'self' 'nonce-aila' https://www.gstatic.com ;
+      //     style-src 'self' 'nonce-aila';
+      //     img-src 'self' data:;
+      //     connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000;
+      //     frame-src ;
+      //   `.replace(/\s{2,}/g, ' ').trim()
+      // }
     ],
   })
 

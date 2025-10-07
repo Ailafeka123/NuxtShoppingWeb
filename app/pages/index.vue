@@ -1,7 +1,7 @@
-<script lang="ts" setup nonce="aila">
+<script lang="ts" setup >
 
 </script>
-<style lang="sass" module nonce="aila">
+<style lang="sass" module >
 
 </style>
 <template>
