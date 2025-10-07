@@ -20,7 +20,13 @@ export default defineNitroPlugin((nitroApp) => {
         `connect-src 'self'`
       ].join('; ').replace(/\s{2,}/g, ' ').trim()
     )
-
+    if (htmlContext.head && Array.isArray(htmlContext.head)) {
+        htmlContext.head = htmlContext.head.map(chunk =>
+            typeof chunk === 'string'
+            ? chunk.replace(/<script\b(?![^>]*\bnonce=)([^>]*)>/ig, `<script$1 nonce="${nonce}">`)
+            : chunk
+        )
+    }
 
      if (htmlContext.body && Array.isArray(htmlContext.body)) {
         htmlContext.body = htmlContext.body.map(chunk =>
