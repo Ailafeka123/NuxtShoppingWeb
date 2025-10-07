@@ -23,7 +23,9 @@ export default defineNitroPlugin((nitroApp) => {
     if (htmlContext.head && Array.isArray(htmlContext.head)) {
         htmlContext.head = htmlContext.head.map(chunk =>
             typeof chunk === 'string'
-            ? chunk.replace(/<script\b(?![^>]*\bnonce=)([^>]*)>/ig, `<script$1 nonce="${nonce}">`)
+            ? chunk
+                .replace(/<script\b(?![^>]*\bnonce=)([^>]*)>/ig, `<script$1 nonce="${nonce}">`)
+                .replace(/<style\b(?![^>]*\bnonce=)([^>]*)>/ig, `<style$1 nonce="${nonce}">`)
             : chunk
         )
     }
