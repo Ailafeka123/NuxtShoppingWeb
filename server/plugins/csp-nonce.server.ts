@@ -18,7 +18,7 @@ export default defineNitroPlugin((nitroApp) => {
       [
         `default-src 'self'`,
         `script-src 'self'  https://www.gstatic.com  'nonce-${nonce}' ` ,
-        `style-src 'self' 'unsafe-inline' 'nonce-${nonce}' `,
+        `style-src 'self' 'nonce-${nonce}' `,
         `img-src 'self' data:`,
         `connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000 `
       ].join('; ').replace(/\s{2,}/g, ' ').trim()

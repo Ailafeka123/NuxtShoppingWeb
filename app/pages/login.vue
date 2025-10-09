@@ -5,6 +5,10 @@
     const password = ref<string>("");
     // 密碼顯示
     const passwordShow = ref<boolean>(false);
+    const changePasswordShow = () =>{
+        passwordShow.value = !passwordShow.value;
+    }
+
     // 註冊 true 或 登入false
     const method = ref<boolean>(false);
     const errorMessage = ref<string>("");
@@ -71,7 +75,7 @@
                     <div>
                         <label>密碼</label>
                         <input :type="passwordShow ? 'text':'password'" v-model="password"></input>
-                        <button type="button" @click="passwordShow = !passwordShow">X</button>
+                        <button type="button" @click="changePasswordShow">X</button>
                         <p>{{ password }}</p>
                     </div>
                 </form>
