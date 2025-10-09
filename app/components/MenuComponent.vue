@@ -1,5 +1,4 @@
 <script lang="ts" setup >
-
 </script>
 <style lang="scss" module="style" >
     .header{
@@ -16,6 +15,10 @@
         border:var(--textColor) 1px solid;
         box-sizing: border-box;
         background-color: var(--background);
+        .icon{
+            width: 40px;
+            height: 40px;
+        }
         .itemDiv{
             padding: 0 16px;
             ul{
@@ -32,16 +35,19 @@
 
     <header :class="style.header">
         <div>
-            icon
+            <NuxtLink to="/">
+                <img src="/selficon/selficon.svg"  :class=[style.icon] alt="icon">
+            </NuxtLink>
+            
         </div>
 
         <div :class="style.itemDiv">
             <ul>
                 <li>
-                    購物車
-                </li>
-                <li>
+                <NuxtLink to="/login">
                     登入
+                </NuxtLink>
+                        
                 </li>
             </ul>
         </div>

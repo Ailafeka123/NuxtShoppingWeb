@@ -8,16 +8,19 @@ export default defineNitroPlugin((nitroApp) => {
     .replace(/=+$/, '')       // 去掉尾部 =
 
     event.context.cspNonce = nonce
-
+    // 開發狀態unsafe-inline
+    // 最後上架再把nonce這段加上去
+    // 'unsafe-inline'
+    // 'nonce-${nonce}'
     // 設定 CSP header
-    event.res.setHeader(
+    setHeader(event,
       'Content-Security-Policy',
       [
         `default-src 'self'`,
-        `script-src 'self' 'nonce-${nonce}'`,
-        `style-src 'self' 'nonce-${nonce}'`,
+        `script-src 'self'  https://www.gstatic.com  'nonce-${nonce}' ` ,
+        `style-src 'self' 'unsafe-inline' 'nonce-${nonce}' `,
         `img-src 'self' data:`,
-        `connect-src 'self'`
+        `connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000 `
       ].join('; ').replace(/\s{2,}/g, ' ').trim()
     )
     if (htmlContext.head && Array.isArray(htmlContext.head)) {

@@ -20,3 +20,7 @@ main{
     height: 100svh;
     padding: 32px 0 0 0 ;
 }
+a{
+    color:var( --textColor);
+    text-decoration-line: none;
+}
