@@ -7,22 +7,37 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/image',
-    '@nuxt/content'
+    '@nuxt/content',
+    'nuxt-security'
   ],
-  app:{
-    baseURL:"/",
-    head:{
-      meta:[
-        {
-          'http-equiv': 'Content-Security-Policy',
-          content: `
-            img-src 'self' data:;
-            connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000;
-            frame-src 'self';
-          `.replace(/\s{2,}/g, ' ').trim()
-        }
-      ]
+  security: {
+    headers: {
+      contentSecurityPolicy: {
+        // reportOnly: process.env.NODE_ENV !== 'production',
+        'default-src': ["'self'"],
+        'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'"],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'img-src': ["'self'", 'data:', 'blob:'],
+        'object-src': ["'none'"],
+        'frame-ancestors': ["'none'"],
+        // upgradeInsecureRequests: true
+      }
     }
-
   }
 })
+// app:{
+  //   baseURL:"/",
+  //   head:{
+  //     meta:[
+  //       {
+  //         'http-equiv': 'Content-Security-Policy',
+  //         content: `
+  //           img-src 'self' data:;
+  //           connect-src 'self' wss://firebasedatabase.app wss://nuxt-shopping-web.vercel.app ws://localhost:4000;
+  //           frame-src 'self';
+  //         `.replace(/\s{2,}/g, ' ').trim()
+  //       }
+  //     ]
+  //   }
+
+  // }
