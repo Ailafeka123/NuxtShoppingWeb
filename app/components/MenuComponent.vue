@@ -1,4 +1,6 @@
+
 <script lang="ts" setup >
+    const authState = useNuxtApp().$authState as Ref<boolean>;
 </script>
 <style lang="scss" module="style" >
     .header{
@@ -15,6 +17,7 @@
         border:var(--textColor) 1px solid;
         box-sizing: border-box;
         background-color: var(--background);
+        z-index: 9999;
         .icon{
             width: 40px;
             height: 40px;
@@ -27,6 +30,9 @@
                 align-items: center;
                 justify-content: center;
                 gap: 16px;
+                .LoginOutButton{
+                    cursor: pointer;
+                }
             }
         }
     }
@@ -42,14 +48,24 @@
         </div>
 
         <div :class="style.itemDiv">
-            <ul>
+
+            <ul v-if="authState === false">
                 <li>
-                <NuxtLink to="/login">
-                    登入
-                </NuxtLink>
-                        
+                    <NuxtLink to="/login">
+                        登入
+                    </NuxtLink>
                 </li>
             </ul>
+
+            <ul v-else>
+                <li>
+                    
+                </li>
+                <li>
+                    <p @click="AuthSignOut" :class="style.LoginOutButton">登出</p>
+                </li>
+            </ul>
+
         </div>
 
     </header>

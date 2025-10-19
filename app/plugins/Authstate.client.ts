@@ -1,0 +1,62 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp,getApps, getApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getDatabase } from 'firebase/database'
+import { getFirestore } from "firebase/firestore";
+import { getAuth, onAuthStateChanged,signOut} from "firebase/auth";
+// client 端讀取參數
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDqoSshYcssa65E4H6J7IAtcaGSNBPFLxM",
+  authDomain: "aila-nuxt-shoppingweb.firebaseapp.com",
+  databaseURL: "https://aila-nuxt-shoppingweb-default-rtdb.firebaseio.com",
+  projectId: "aila-nuxt-shoppingweb",
+  storageBucket: "aila-nuxt-shoppingweb.firebasestorage.app",
+  messagingSenderId: "1091064377475",
+  appId: "1:1091064377475:web:62e4f76f83e991817cebb6",
+  measurementId: "G-VGJD28W4Q9"
+};
+// Initialize Firebase
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const rtdb = getDatabase(app)
+
+// const analytics = getAnalytics(app);
+
+
+import type { User } from 'firebase/auth'
+export default defineNuxtPlugin((nuxtApp)=>{
+  const user = ref<null|User>(null)
+  const loading = ref<boolean>(true);
+  const LoginState = ref<boolean>(false);
+  onAuthStateChanged(auth,(u)=>{
+    if(u){
+      const lastLoginTime = u.metadata?.lastSignInTime;
+      const lastLoginAt:number = new Date(lastLoginTime).getTime(); // ✅ 轉成毫秒時間戳
+      const nowTime: number = Date.now();
+      const df = (nowTime - lastLoginAt)/1000/60/60;
+      // 目前設定超出一個小時 則登出
+      if(df > 1){
+        signOut(auth);
+        user.value = null;
+        LoginState.value = false;
+      }else{  
+        user.value = u;
+        LoginState.value = true;
+      }
+      loading.value = false;
+    }else{
+      user.value = null;
+      LoginState.value = false;
+    }
+  })
+  nuxtApp.provide('authUser', user);
+  nuxtApp.provide('authState',LoginState);
+
+})

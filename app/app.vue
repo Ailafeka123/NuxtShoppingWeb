@@ -16,12 +16,11 @@
     ],
   })
 
-
+  // 根據使用者主題 轉換顏色
   onMounted(()=>{
     const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     // 捕捉link為icon的作為參數保存
     let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-    console.log(`darkMode = ${darkMode}`)
     if(darkMode){
       iconString.value = `/selficon/selficon_light.svg`;
       // userClient.value = true;
