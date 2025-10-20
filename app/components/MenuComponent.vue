@@ -46,26 +46,26 @@
             </NuxtLink>
             
         </div>
-
+        
         <div :class="style.itemDiv">
+            <ClientOnly>
+                <ul v-if="authState === false">
+                    <li>
+                        <NuxtLink to="/login">
+                            登入
+                        </NuxtLink>
+                    </li>
+                </ul>
 
-            <ul v-if="authState === false">
-                <li>
-                    <NuxtLink to="/login">
-                        登入
-                    </NuxtLink>
-                </li>
-            </ul>
-
-            <ul v-else>
-                <li>
-                    
-                </li>
-                <li>
-                    <p @click="AuthSignOut" :class="style.LoginOutButton">登出</p>
-                </li>
-            </ul>
-
+                <ul v-else>
+                    <li>
+                        
+                    </li>
+                    <li>
+                        <p @click="AuthSignOut" :class="style.LoginOutButton">登出</p>
+                    </li>
+                </ul>
+            </ClientOnly>
         </div>
 
     </header>

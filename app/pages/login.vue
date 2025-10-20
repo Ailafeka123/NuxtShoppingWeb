@@ -1,5 +1,6 @@
 <script lang="ts" setup>
     import { ref, onMounted, watch} from 'vue';
+    import ForgetPassword from '~/components/login/forgetPassword.vue';
     // 抓取是否登入狀態
     const authState = useNuxtApp().$authState as Ref<boolean>;
     
@@ -26,6 +27,8 @@
     // 註冊 true 或 登入false
     const method = ref<boolean>(false);
     const errorMessage = ref<string>("");
+    // 是否開啟忘記密碼
+    const forgetPasswordState  = ref<boolean>(false)
 
     // 轉換密碼顯示狀態
     const changePasswordShow = (value:boolean|null = null) =>{
@@ -80,10 +83,18 @@
     }
 
     // 提交檢驗
-    const submitForm = () =>{
+    const submitForm = async() =>{
         console.log(`account = ${account.value}`);
         console.log(`password = ${password.value}`);
-        // 檢查
+        // 檢查帳號密碼是否有輸入
+        if(account.value === ""){
+            errorMessage.value = "帳號不得為空";
+            return;
+        }else if(password.value === ""){
+            errorMessage.value = "密碼不得為空";
+            return ;
+        }
+        // 檢查 帳號密碼是否還有警告
         if(accountAlter.value !== ""){
             errorMessage.value = accountAlter.value
             return;
@@ -91,20 +102,30 @@
             errorMessage.value = passwordAlter.value;
             return;
         } 
+        // 二度檢驗是否投入違法字元
         let accountVal = account.value.replace(/[^a-zA-Z0-9!@#$%&'*+/=?^_`{|}~.-]/g, '');
         let passwordVal = password.value.replace(/[^a-zA-Z0-9]/g,'');
         if(accountVal !== account.value){
-            errorMessage.value = "帳號請勿輸入非法文字"
+            errorMessage.value = "帳號請勿輸入非法文字";
             return;
         }else if(passwordVal !== password.value){
-            errorMessage.value = "密碼請勿輸入非法文字"
+            errorMessage.value = "密碼請勿輸入非法文字";
             return;
         }
+
         // 進行登入或註冊
         if(method.value === false){
-            AuthLoading(accountVal,passwordVal);
+            const Message = await AuthLoading(accountVal,passwordVal);
+            if(Message === false){
+                errorMessage.value = "帳號密碼錯誤"
+                return;
+            }
         }else{
-            AuthRegister(accountVal,passwordVal);
+            const registerMessage = await AuthRegister(accountVal,passwordVal);
+            if(registerMessage === false){
+                errorMessage.value = "已有此帳號"
+                return;
+            }
         }
 
         
@@ -207,6 +228,9 @@
                         color:red;
                         text-align: center;
                     }
+                    .forgetPassword{
+                        cursor: pointer;
+                    }
                     .submitDiv{
                         display: flex;
                         flex-direction: column;
@@ -254,7 +278,7 @@
                     </div>
                     <p :class="style.alterText">{{ passwordAlter }}</p>
                     <div>
-                        <p>忘記密碼</p>
+                        <p :class="style.forgetPassword">忘記密碼</p>
                     </div>
                     <p :class="style.errorText" v-if="errorMessage !== ''">{{ errorMessage }}</p>
                     <div :class="style.submitDiv">
@@ -264,6 +288,6 @@
                 </form>
             </section>
         </article>
-
+        <!-- <ForgetPassword :open="forgetPasswordState"/> -->
     </main>
 </template>

@@ -36,20 +36,26 @@ export default defineNuxtPlugin((nuxtApp)=>{
   const loading = ref<boolean>(true);
   const LoginState = ref<boolean>(false);
   onAuthStateChanged(auth,(u)=>{
+    // 有帳號 抓取上一次登入 超出一小時則進行撐登出，無法判店也是進行登出
     if(u){
-      const lastLoginTime = u.metadata?.lastSignInTime;
-      const lastLoginAt:number = new Date(lastLoginTime).getTime(); // ✅ 轉成毫秒時間戳
-      const nowTime: number = Date.now();
-      const df = (nowTime - lastLoginAt)/1000/60/60;
-      // 目前設定超出一個小時 則登出
-      if(df > 1){
+      const lastLoginTime = u.metadata.lastSignInTime;
+      if(lastLoginTime){
+        const lastLoginAt:number = new Date(lastLoginTime).getTime(); // ✅ 轉成毫秒時間戳
+        const nowTime: number = Date.now();
+        const df = (nowTime - lastLoginAt)/1000/60/60;
+        if(df > 1){
+          signOut(auth);
+          user.value = null;
+          LoginState.value = false;
+        }else{  
+          user.value = u;
+          LoginState.value = true;
+        }
+      }else{
         signOut(auth);
-        user.value = null;
-        LoginState.value = false;
-      }else{  
-        user.value = u;
-        LoginState.value = true;
       }
+      // 目前設定超出一個小時 則登出
+      
       loading.value = false;
     }else{
       user.value = null;
