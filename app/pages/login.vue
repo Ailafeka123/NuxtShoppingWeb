@@ -138,7 +138,10 @@
 
 <style module="style" lang="scss">
     .loadingMainDiv{
+        display: flex;
         padding: 0;
+        width: 100%;
+        min-height: 100svh;
         @media(min-width: 768px){
             display: flex;
             flex-direction: row;
@@ -154,16 +157,15 @@
             padding: 16px;
             height: 100%;
             background-color: #93f0a1;
-            width: 100svw;
+            width: 100%;
             @media(min-width:768px){
-                width: 50svw;
+                width: 50%;
             }
             .loginSection{
                 width: 100%;
                 .inputForm{
                     display: flex;
                     flex-direction: column;
-                    margin: 16px 0;
                     align-items: center;
                     justify-content: start;
                     gap: 16px;
@@ -278,7 +280,7 @@
                     </div>
                     <p :class="style.alterText">{{ passwordAlter }}</p>
                     <div>
-                        <p :class="style.forgetPassword">忘記密碼</p>
+                        <p :class="style.forgetPassword" @click="forgetPasswordState = true">忘記密碼</p>
                     </div>
                     <p :class="style.errorText" v-if="errorMessage !== ''">{{ errorMessage }}</p>
                     <div :class="style.submitDiv">
@@ -288,6 +290,6 @@
                 </form>
             </section>
         </article>
-        <!-- <ForgetPassword :open="forgetPasswordState"/> -->
+        <ForgetPassword :alterOpen="forgetPasswordState" @closeForget ="forgetPasswordState = false"/>
     </main>
 </template>
