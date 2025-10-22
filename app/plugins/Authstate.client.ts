@@ -32,7 +32,8 @@ export const rtdb = getDatabase(app)
 
 import type { User } from 'firebase/auth'
 export default defineNuxtPlugin((nuxtApp)=>{
-  const user = ref<null|User>(null)
+  const user = ref<null|User>(null);
+  const userId = ref<string>("");
   const loading = ref<boolean>(true);
   const LoginState = ref<boolean>(false);
   onAuthStateChanged(auth,(u)=>{
@@ -46,23 +47,30 @@ export default defineNuxtPlugin((nuxtApp)=>{
         if(df > 1){
           signOut(auth);
           user.value = null;
+          userId.value = "";
           LoginState.value = false;
         }else{  
           user.value = u;
+          userId.value = u.uid;
+          console.log("userId = ",userId.value);
           LoginState.value = true;
         }
       }else{
         signOut(auth);
       }
       // 目前設定超出一個小時 則登出
-      
-      loading.value = false;
     }else{
       user.value = null;
+      userId.value = "";
       LoginState.value = false;
     }
+
+    loading.value = false;
+    console.log(`loading = false`);
   })
   nuxtApp.provide('authUser', user);
+  nuxtApp.provide('authUserId',userId);
   nuxtApp.provide('authState',LoginState);
+  nuxtApp.provide("pluginsLoading",loading);
 
 })

@@ -1,12 +1,16 @@
+import {auth,db} from "~/plugins/Authstate.client";
+import { setDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import {auth} from "~/plugins/Authstate.client"
 
 export const AuthLoading = async(account:string, password:string) =>{
-    console.log("進行登入")
     try{
+        // 進行登入
         const userCredential = await signInWithEmailAndPassword(auth, account, password);
-        console.log("登入成功");
-        console.log(userCredential);
+        const uid = userCredential.user.uid;
+        // 更新最後登入時間
+        await updateDoc(doc(db,"auth",uid),{
+            lastLogin: serverTimestamp()
+        })
         await  navigateTo('/');
         return  true
     }catch(e){
@@ -16,11 +20,18 @@ export const AuthLoading = async(account:string, password:string) =>{
 }
 
 export const  AuthRegister = async(account:string, password:string) =>{
-    console.log("進行註冊")
     try{
+        // 進行註冊
         const userCredential = await createUserWithEmailAndPassword(auth,account,password);
-        console.log(`註冊成功`)
-        console.log(userCredential);
+        const uid = userCredential.user.uid;
+        const email = userCredential.user.email;
+        // 建立帳號資訊到firestore
+        await setDoc(doc(db,"auth",uid),{
+            email:email,
+            level:"user",
+            createTime : serverTimestamp(),
+            lastLogin: serverTimestamp(),
+        })
         await  navigateTo('/');
         return true;
     }catch(e){
@@ -30,7 +41,6 @@ export const  AuthRegister = async(account:string, password:string) =>{
 }
 
 export const forgetAccount = async(account:string) =>{
-    console.log("忘記密碼");
     try{
         await sendPasswordResetEmail(auth,account);
         return  true;
