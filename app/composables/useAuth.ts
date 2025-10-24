@@ -1,6 +1,6 @@
 import {auth,db} from "~/plugins/Authstate.client";
-import { setDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { setDoc, doc, serverTimestamp, updateDoc, deleteDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut ,EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
 
 export const AuthLoading = async(account:string, password:string) =>{
     try{
@@ -28,6 +28,8 @@ export const  AuthRegister = async(account:string, password:string) =>{
         // 建立帳號資訊到firestore
         await setDoc(doc(db,"auth",uid),{
             email:email,
+            userName:email,
+            userIcon:"",
             level:"user",
             createTime : serverTimestamp(),
             lastLogin: serverTimestamp(),
@@ -58,5 +60,41 @@ export const AuthSignOut = async() =>{
         console.log("已登出");
     } catch (error) {
         console.error("登出失敗:", error);
+    }
+}
+
+export const AuthCheckPassword = async(email:string,password:string) =>{
+    const user = auth.currentUser;
+    if(user === null){
+        console.error(`auth 抓取錯誤`)
+        return false;
+    }
+    try{
+        const credential = EmailAuthProvider.credential(email, password);
+        await reauthenticateWithCredential(user, credential);
+        return true;
+    }catch(e){
+        console.error(`確認錯誤:`,e);
+        return false;
+    }
+}
+
+export const AuthDelete = async() =>{
+    console.log("刪除帳號")
+    const user = auth.currentUser;
+    const uid = user?.uid;
+    if(user === undefined || user === null){
+        return false;
+    }
+    if(uid === undefined || uid === null){
+        return false;
+    }
+    try{
+        await deleteDoc(doc(db,"auth",uid));
+        await deleteUser(user);
+        return true;
+    }catch(e){
+        console.error("產生錯誤:",e);
+        return false;
     }
 }

@@ -59,7 +59,7 @@
 
                 <ul v-else>
                     <li>
-                        
+                        <NuxtLink to="/selfData">個人資訊</NuxtLink>
                     </li>
                     <li>
                         <p @click="AuthSignOut" :class="style.LoginOutButton">登出</p>
