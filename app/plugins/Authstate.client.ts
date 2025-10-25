@@ -52,7 +52,6 @@ export default defineNuxtPlugin((nuxtApp)=>{
         }else{  
           user.value = u;
           userId.value = u.uid;
-          console.log("userId = ",userId.value);
           LoginState.value = true;
         }
       }else{
@@ -66,7 +65,6 @@ export default defineNuxtPlugin((nuxtApp)=>{
     }
 
     loading.value = false;
-    console.log(`loading = false`);
   })
   nuxtApp.provide('authUser', user);
   nuxtApp.provide('authUserId',userId);

@@ -2,9 +2,15 @@
     import { ref } from 'vue';
     const iconUpperDate = defineProps<{openState:boolean, userId:string}>();
     const emit = defineEmits<{(e:"openState"):void, (e:"upperDate",value:string):void}>();
+    const inputFileRef = ref<HTMLInputElement| null>(null)
     const userIconInput = ref<string| null>(null);
     const upperDateError = ref<string>("");
     const coldDown = ref<boolean>(false);
+    // 去觸發inputFile
+    const clickToOpenFile = () =>{
+        inputFileRef.value?.click();
+    }
+    // 更新並顯示圖片
     const updateIconImgFunction = (e:Event) =>{
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
@@ -15,9 +21,24 @@
         };
         reader.readAsDataURL(file); // 轉成 base64 Data URL
     }
+    // 拖移觸發
+    function handleDrop(e: DragEvent) {
+        const files = e.dataTransfer?.files
+        if (!files || files.length === 0) return
+        const file = files[0] // 取得第一個檔案
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            userIconInput.value = reader.result as string;
+        };
+        reader.readAsDataURL(file); // 轉成 base64 Data URL
+    }
+
+    // 關閉視窗
     const closeFunc = () =>{
         emit("openState");
     }
+    // 確定 並上傳
     const checkFun = async() =>{
         if(userIconInput.value === null) return;
         if(coldDown.value === true) return;
@@ -43,9 +64,7 @@
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.3);
-        &.hidden{
-            display: none;
-        }
+        z-index: 9999;
         .upperDateDiv{
             position: fixed;
             top: 50%;
@@ -55,8 +74,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
-
+            justify-content: start;
+            gap: 16px;
             background-color: #fff;
             border-radius: 8px;
             border:2px solid black;
@@ -65,34 +84,55 @@
             @media(min-width: 768px){
                 width: calc((10/12)*100%);
                 min-width: 768px;
+                padding: 8px;
             }
             .userIconDiv{
-                height: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 80%;
                 width: 100%;
                 overflow: hidden;
+                border:2px solid black;
+                border-width: 0 0 2px 0;
+                cursor: pointer;
+                @media(min-width:768px){
+                    border-width: 2px;
+                }
                 img{
                     width: 100%;
                     height: 100%;
                     object-fit: contain; 
                 }
             }
+            .hidden{
+                display: none;
+            }
+            .buttonDiv{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                width: 100%;
+            }
         }
     }
 </style>
 
 <template>
-    <div :class="[style.upperDateBack, {[style.hidden]:!iconUpperDate.openState}]">
-        <div :class="style.upperDateDiv">
-            <div :class="style.userIconDiv">
-                <div v-if="userIconInput === null"></div>
+    <div :class="[style.upperDateBack]" @click = "closeFunc">
+        <div :class="style.upperDateDiv" @click.stop>
+            <div :class="style.userIconDiv" @click="clickToOpenFile" @dragover.prevent   @drop.prevent="handleDrop" >
+                <p v-if="userIconInput === null">
+                    點擊或拖曳上傳圖片
+                </p>
                 <img v-else :src="userIconInput" ></img>
             </div>
-            <div>
-                <input type="file" @change="updateIconImgFunction"></input>
-            </div>
+            <input type="file" ref="inputFileRef" :class="style.hidden" @change="updateIconImgFunction"></input>
             <p>{{ upperDateError }}</p>
-            <div>
-                <button type="button" @click="checkFun">確定</button>
+            <div :class="style.buttonDiv">
+                <button type="button" @click="checkFun" :disabled="coldDown">確定</button>
+                <button type="button" @click="closeFunc" :disabled="coldDown">關閉</button>
             </div>
         </div>
     </div>

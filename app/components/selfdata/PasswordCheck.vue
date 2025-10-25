@@ -1,19 +1,22 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-    
+    // 父層確認信箱資訊
     const reCheckProps = defineProps<{email:string; openState:boolean}>()
     const emit = defineEmits<{(e:"closeState"):void}>()
+    // 再度確認的密碼與密碼提示
     const recheckPassword = ref<string>("");
     const recheckPasswordAlter = ref<string>("");
-
+    // 刪除行動的提示框顯示與文字
     const deleteActionBollean = ref<boolean>(false);
     const deleteAction = ref<string>("");
+
     const inputPassword = (e:Event) =>{
         const target = e.target as HTMLInputElement;
         recheckPasswordAlter.value = "";
         recheckPassword.value = target.value;
         recheckPassword.value = target.value.replace(/[^a-zA-Z0-9]/g,"");
     }
+    // 提交時的確認
     const submitCheckPassword = async() =>{
         if(recheckPassword.value === ""){
             recheckPasswordAlter.value = "輸入請勿為空"
@@ -28,12 +31,14 @@
             deleteAction.value = "帳號刪除中，請稍等"
             const deleteCheck = await AuthDelete();
             if(deleteCheck){
-                console.log("刪除成功")
+                await AuthSignOut();
+                navigateTo('/');
             }else{
                 console.log("刪除錯誤")
             }
         }
     }
+    // 關閉視窗功能
     const closeStateButton = () =>{
         emit("closeState");
     }
@@ -48,9 +53,6 @@
         height:100%;
         z-index:90;
         background-color: rgba(0, 0, 0,0.5);
-        &.reCheckHidden{
-            display:none;
-        }
         .reCheckPasswordDiv{
             position: fixed;
             display: flex;
@@ -67,7 +69,7 @@
             border-radius: 8px;
             border: 2px solid black;
             @media(min-width:768px){
-                min-width: 768px;
+                max-width: 768px;
             }
             .closeDiv{
                 display: flex;
@@ -97,6 +99,7 @@
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
+                gap: 8px;
                 input{
                     width: calc((10/12)*100%);
                     padding:8px 16px;
@@ -117,7 +120,7 @@
 </style>
 
 <template> 
-    <div :class="[style.reCheckDiv, { [style.reCheckHidden] : !reCheckProps.openState } ]" @click="closeStateButton">
+    <div :class="[style.reCheckDiv ]">
         <div :class="style.reCheckPasswordDiv"  @click.stop>
             <div :class="style.closeDiv">
                 <button type="button" @click="closeStateButton">X</button>
@@ -131,5 +134,5 @@
             <button type="button" @click="submitCheckPassword()">確認</button>
         </div>
     </div>
-    <CheckComponent :checkText="deleteAction" :openState = "deleteActionBollean"/>
+    <WaitComponent v-if="deleteActionBollean" :checkText="deleteAction" :openState = "deleteActionBollean"/>
 </template>

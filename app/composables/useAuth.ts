@@ -54,10 +54,8 @@ export const forgetAccount = async(account:string) =>{
 
 
 export const AuthSignOut = async() =>{
-    console.log("進行登出")
     try {
         await signOut(auth);
-        console.log("已登出");
     } catch (error) {
         console.error("登出失敗:", error);
     }
@@ -80,21 +78,21 @@ export const AuthCheckPassword = async(email:string,password:string) =>{
 }
 
 export const AuthDelete = async() =>{
-    console.log("刪除帳號")
-    const user = auth.currentUser;
-    const uid = user?.uid;
-    if(user === undefined || user === null){
-        return false;
-    }
-    if(uid === undefined || uid === null){
-        return false;
-    }
     try{
-        await deleteDoc(doc(db,"auth",uid));
-        await deleteUser(user);
-        return true;
+        const user = auth.currentUser;
+        if(user){
+            const token = await user.getIdToken();
+            await $fetch("/api/deleteAuth", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,  // <- 這才是前端傳給 server 的訊息
+                },
+            });
+            return true;
+        }else{
+            return false;
+        }
     }catch(e){
-        console.error("產生錯誤:",e);
         return false;
     }
 }

@@ -267,12 +267,12 @@
             <section :class="style.loginSection"  @submit.prevent>
                 <form :class="style.inputForm" >
                     <div :class="style.inputGroup">
-                        <input type="text" :value="account" @input="changeAccount" placeholder=" " required></input>
+                        <input type="text" :value="account" @input="changeAccount" placeholder=" " inputmode="email" required ></input>
                         <label>帳號</label>
                     </div>
                     <p :class="style.alterText">{{ accountAlter }}</p>
                     <div :class="style.inputGroup">
-                        <input :type="passwordShow ? 'text':'password'" :value="password" @input="changePassword" placeholder=" " required></input>
+                        <input :type="passwordShow ? 'text':'password'" :value="password" @input="changePassword" placeholder=" " inputmode="text" required></input>
                         <label>密碼</label>
                         <button type="button" @click="changePasswordShow()" @blur="changePasswordShow(false)" :class="style.eyesButton">
                             <img :src="passwordShow? '/login/eye_light.svg' :'/login/eyeHidden_light.svg' " alt="eyes"></img>

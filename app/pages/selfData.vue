@@ -2,29 +2,50 @@
     import { ref,onMounted,watch } from 'vue';
     import PasswordCheck from '~/components/selfdata/PasswordCheck.vue';
     import UpdateIcon from '~/components/selfdata/UpdateIcon.vue';
+    // 使用者資訊類型
     type userDataType = {
         userName:string,
         userIcon:string,
         email:string,
-        createTime:Date,
-        lastLogin:Date,
+        createTime:string,
+        lastLogin:string,
     }
+    // 抓取共用資料 來使用者載入資料
     const userId = useNuxtApp().$authUserId as Ref<string>;
     const pluginsLoading = useNuxtApp().$pluginsLoading as Ref<boolean>;
+    // 使用者資料
     const userData = ref<userDataType >({
         userName:"",
         userIcon:"",
         email:"",
-        createTime:new Date(),
-        lastLogin:new Date(),
+        createTime:new Date().toLocaleDateString('zh-TW', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }),
+        lastLogin:new Date().toLocaleDateString('zh-TW', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }),
     });
+    // 錯誤提示 查無此資料，卻可以登入
     const userError = ref<boolean>(false);
+    // 使用者資料載入完籌
     const userLoading = ref<boolean>(true);
+    // 圖片上傳功能
     const iconUpperDateState = ref<boolean>(false);
-
+    // 同步加載圖片功能
     const upperDateIconFunc = (e:string) =>{
         userData.value.userIcon = e;
     }
+
+    // 重要提示顯示。
+    const alterDeleteCheck = ref<boolean>(false);
+    const deleteComfireCheck = (e:boolean)=>{
+        deleteCheck.value = e;
+    }
+
     // 刪除功能
     const deleteCheck = ref<boolean>(false);
     // 讀取資料
@@ -35,15 +56,27 @@
                 navigateTo("");
             }else{
                 const data = await readOnceData("auth",userId.value);
-                console.log(`userId.value = `,userId);
-                console.log(data);
                 if(data !== false){
                     userData.value = {
                         userName:data.userName?data.userName:"",
                         userIcon:data.userIcon?data.userIcon:"",
                         email:data.email,
-                        createTime:data.createTime,
-                        lastLogin:data.lastLogin
+                        createTime:data.createTime.toDate().toLocaleDateString('zh-TW', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        }),
+                        lastLogin:data.lastLogin.toDate().toLocaleDateString('zh-TW', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        }),
                     };
                 }else{
                     userError.value = true;
@@ -59,6 +92,7 @@
             }
         },{ immediate: true })
     })
+
 </script>
 <style lang="scss" module="style">
     .main{
@@ -111,9 +145,11 @@
                     justify-content: center;
                     min-width: 40px;
                     min-height: 40px;
+
                     img{
-                        width: 40px;
-                        height: 40px;
+                        width: 50px;
+                        height: 50px;
+                        cursor: pointer;
                     }
                     .imgDiv{
                         width: 40px;
@@ -121,6 +157,7 @@
                         border-radius: 50%;
                         border: 2px solid black;
                         background-color: #5e3030;
+                        cursor: pointer;
                     }
                 }
                 .userHeaderDataDiv{
@@ -151,7 +188,6 @@
 </style>
 <template>
     <main :class="style.main">
-        
         <ClientOnly>
         <article v-if="userLoading === true" :class="style.userLoadingDiv">
             <h2>讀取中，請稍後</h2>
@@ -175,11 +211,13 @@
                 <div :class="style.userHeaderDataDiv">
                     <p><span>使用者:</span><span>{{ userData.email }}</span></p>
                     <p :class="style.userIdString">id:{{ userId }}</p>
+                    <p :class="style.userIdString">上一次登入時間:{{userData.lastLogin}}</p>
+                    <p :class="style.userIdString">帳號創立時間:{{userData.createTime}}</p>
                 </div>
             </header>
             <section :class="style.dataSection">
                 <div>
-                    個人資訊
+                    修改個人訊息
                 </div>
                 <div>
                     修改密碼
@@ -193,12 +231,12 @@
                 <div>
                     近期看過商品
                 </div>
-                <button @click="deleteCheck = true">
+                <button @click="alterDeleteCheck = true">
                     刪除帳號
                 </button>
             </section>
         </article>
-
+        <ComfireComponent v-if="alterDeleteCheck"  :openState="alterDeleteCheck" :alterText="['請問是否要刪除帳號','此步驟無法返回']" @openState="alterDeleteCheck = false" @clickButton="deleteComfireCheck"/>
         <PasswordCheck v-if="deleteCheck" :openState="deleteCheck" :email= "userData.email"  @closeState="deleteCheck = false"/>
         <UpdateIcon v-if="iconUpperDateState"  :openState="iconUpperDateState" :userId="userId" @openState="iconUpperDateState = false" @upperDate="upperDateIconFunc"/>
         </ClientOnly>   
