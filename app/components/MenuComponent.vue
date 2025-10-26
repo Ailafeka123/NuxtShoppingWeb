@@ -1,6 +1,12 @@
 
 <script lang="ts" setup >
     const authState = useNuxtApp().$authState as Ref<boolean>;
+    const authLevel = useNuxtApp().$authLevel as Ref<boolean>;
+    // 登出功能
+    const SignOutClick = async() =>{
+        await AuthSignOut();
+        navigateTo("/");
+    }
 </script>
 <style lang="scss" module="style" >
     .header{
@@ -58,11 +64,14 @@
                 </ul>
 
                 <ul v-else>
+                    <li v-if="authLevel">
+                        <NuxtLink to="/backData">資料庫管理</NuxtLink>
+                    </li>
                     <li>
                         <NuxtLink to="/selfData">個人資訊</NuxtLink>
                     </li>
                     <li>
-                        <p @click="AuthSignOut" :class="style.LoginOutButton">登出</p>
+                        <p @click="SignOutClick" :class="style.LoginOutButton">登出</p>
                     </li>
                 </ul>
             </ClientOnly>

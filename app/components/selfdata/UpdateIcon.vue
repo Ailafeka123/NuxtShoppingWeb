@@ -1,11 +1,13 @@
 <script setup lang="ts">
     import { ref } from 'vue';
+    import WaitComponent from '../WaitComponent.vue';
     const iconUpperDate = defineProps<{openState:boolean, userId:string}>();
     const emit = defineEmits<{(e:"openState"):void, (e:"upperDate",value:string):void}>();
     const inputFileRef = ref<HTMLInputElement| null>(null)
     const userIconInput = ref<string| null>(null);
     const upperDateError = ref<string>("");
     const coldDown = ref<boolean>(false);
+    const alterDiv = ref<boolean>(false);
     // 去觸發inputFile
     const clickToOpenFile = () =>{
         inputFileRef.value?.click();
@@ -15,6 +17,13 @@
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (!file) return;
+        if(!file.type.startsWith('image/')){
+            alterDiv.value = true;
+            setTimeout(()=>{
+                alterDiv.value = false;
+            },1000)
+            return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
             userIconInput.value = reader.result as string;
@@ -27,6 +36,13 @@
         if (!files || files.length === 0) return
         const file = files[0] // 取得第一個檔案
         if (!file) return;
+        if(!file.type.startsWith('image/')){
+            alterDiv.value = true;
+            setTimeout(()=>{
+                alterDiv.value = false;
+            },1000)
+            return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
             userIconInput.value = reader.result as string;
@@ -128,12 +144,13 @@
                 </p>
                 <img v-else :src="userIconInput" ></img>
             </div>
-            <input type="file" ref="inputFileRef" :class="style.hidden" @change="updateIconImgFunction"></input>
+            <input type="file" ref="inputFileRef" :class="style.hidden" @change="updateIconImgFunction" accept="image/*" ></input>
             <p>{{ upperDateError }}</p>
             <div :class="style.buttonDiv">
                 <button type="button" @click="checkFun" :disabled="coldDown">確定</button>
                 <button type="button" @click="closeFunc" :disabled="coldDown">關閉</button>
             </div>
         </div>
+        <WaitComponent v-if="alterDiv" :openState="alterDiv" checkText="檔案類型錯誤，請放入圖片"/>
     </div>
 </template>

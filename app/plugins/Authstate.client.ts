@@ -36,7 +36,9 @@ export default defineNuxtPlugin((nuxtApp)=>{
   const userId = ref<string>("");
   const loading = ref<boolean>(true);
   const LoginState = ref<boolean>(false);
-  onAuthStateChanged(auth,(u)=>{
+  // 權限等級 1最高 3最低
+  const authLevel = ref<boolean>(false)
+  onAuthStateChanged(auth,async(u)=>{
     // 有帳號 抓取上一次登入 超出一小時則進行撐登出，無法判店也是進行登出
     if(u){
       const lastLoginTime = u.metadata.lastSignInTime;
@@ -49,10 +51,16 @@ export default defineNuxtPlugin((nuxtApp)=>{
           user.value = null;
           userId.value = "";
           LoginState.value = false;
+          authLevel.value = false;
         }else{  
           user.value = u;
           userId.value = u.uid;
           LoginState.value = true;
+          const data = await readOnceData("auth",userId.value);
+          if(data){
+            const authLevelState = await AuthLevelCheck();
+            authLevel.value = authLevelState;
+          }
         }
       }else{
         signOut(auth);
@@ -61,6 +69,7 @@ export default defineNuxtPlugin((nuxtApp)=>{
     }else{
       user.value = null;
       userId.value = "";
+      authLevel.value = false;
       LoginState.value = false;
     }
 
@@ -70,5 +79,5 @@ export default defineNuxtPlugin((nuxtApp)=>{
   nuxtApp.provide('authUserId',userId);
   nuxtApp.provide('authState',LoginState);
   nuxtApp.provide("pluginsLoading",loading);
-
+  nuxtApp.provide("authLevel",authLevel);
 })

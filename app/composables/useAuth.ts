@@ -1,7 +1,7 @@
 import {auth,db} from "~/plugins/Authstate.client";
 import { setDoc, doc, serverTimestamp, updateDoc, deleteDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut ,EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
-
+// 登入並修改最後登入時間
 export const AuthLoading = async(account:string, password:string) =>{
     try{
         // 進行登入
@@ -11,14 +11,14 @@ export const AuthLoading = async(account:string, password:string) =>{
         await updateDoc(doc(db,"auth",uid),{
             lastLogin: serverTimestamp()
         })
-        await  navigateTo('/');
-        return  true
+        navigateTo('/');
+        return  true;
     }catch(e){
         console.error(`錯誤訊息:${e}`)
         return false;
     }
 }
-
+// 註冊 建立檔案
 export const  AuthRegister = async(account:string, password:string) =>{
     try{
         // 進行註冊
@@ -41,7 +41,7 @@ export const  AuthRegister = async(account:string, password:string) =>{
         return false
     }
 }
-
+// 忘記密碼，寄送信件
 export const forgetAccount = async(account:string) =>{
     try{
         await sendPasswordResetEmail(auth,account);
@@ -52,7 +52,7 @@ export const forgetAccount = async(account:string) =>{
     }
 }
 
-
+// 登出
 export const AuthSignOut = async() =>{
     try {
         await signOut(auth);
@@ -60,7 +60,7 @@ export const AuthSignOut = async() =>{
         console.error("登出失敗:", error);
     }
 }
-
+// 二度驗證
 export const AuthCheckPassword = async(email:string,password:string) =>{
     const user = auth.currentUser;
     if(user === null){
@@ -76,7 +76,7 @@ export const AuthCheckPassword = async(email:string,password:string) =>{
         return false;
     }
 }
-
+// 丟給後端刪除要求
 export const AuthDelete = async() =>{
     try{
         const user = auth.currentUser;
@@ -89,6 +89,26 @@ export const AuthDelete = async() =>{
                 },
             });
             return true;
+        }else{
+            return false;
+        }
+    }catch(e){
+        return false;
+    }
+}
+// 丟給後端檢查權限
+export const AuthLevelCheck = async() =>{
+    try{
+        const user = auth.currentUser;
+        if(user){
+            const token = await user.getIdToken();
+            const getLevel = await $fetch("/api/authLevelCheck", {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,  // <- 這才是前端傳給 server 的訊息
+                },
+            });
+            return getLevel;
         }else{
             return false;
         }
