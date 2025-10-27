@@ -1,14 +1,9 @@
 <script setup lang="ts">
-    import { limit } from 'firebase/firestore';
 import { ref,onMounted } from 'vue';
-    // 二度確認，避免前端部分被修改
-    onMounted(async()=>{
-        const getLevel = await AuthLevelCheck();
-        if(getLevel === false){
-            navigateTo('/');
-        }
-    })
-    // 查詢方式
+import {auth} from '~/plugins/Authstate.client';
+import type { Timestamp } from 'firebase-admin/firestore'
+// import type { AuthType } from '~/types/auth';
+     // 查詢方式
     type searchMethodType ={
         method:"auth" | "product" | "cart" | "active",
         sort:"name"|"editTime",
@@ -16,13 +11,7 @@ import { ref,onMounted } from 'vue';
         searchBox:string,
         limit:number
     }
-    type getDataType = {
-        idKey:string,
-        name:string,
-        editTime:string,
-        creatTime:string,
 
-    }
     // 傳遞排序的方法
     const SearchMethod = ref<searchMethodType>({
         method:"auth",
@@ -32,9 +21,63 @@ import { ref,onMounted } from 'vue';
         limit:10
     })
     // 接收資料
+    // const AuthGetData = ref<authType[]>([]);
+
 
     // 目前進行模式
-    const method = ref<"edit"|"">();
+    const method = ref<"edit"|"create">("edit");
+    const getData = async(require:any) =>{
+        if(auth.currentUser){
+            const changeTime = (ts: Timestamp) =>{
+                return ts.toDate().toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false  // 24小時制
+                })
+
+            }
+            const token = await auth.currentUser.getIdToken();
+            const data = await $fetch('/api/authEdit/authGetAll',{
+                    method: "GET",
+                    headers:{
+                        DataMethod:require,
+                        Authorization:token,
+                    }    
+                }
+            );
+            console.log(data)
+            // if(data){
+            //     AuthGetData.value = data.map( (index:any)=>{
+            //         return(
+            //             {
+            //                 id:index.id,
+            //                 email:index.email ? index.email : "null",
+            //                 usericon:index.usericon ? index.usericon : "",
+            //                 userName:index.userName  ? index.userName : "",
+            //                 lastLogin:index.lastLogin? changeTime(index.lastLogin) : "null",
+            //                 createTime : index.createTime ? changeTime(index.createTime) : "null",
+            //                 userLevel : index.level  ? index.level : "warn!!!!"
+            //             }
+            //         )
+            //     })
+            // }
+        }
+    }
+    // 二度確認，避免前端部分被修改
+    onMounted(async()=>{
+        const getLevel = await AuthLevelCheck();
+        if(getLevel === false){
+            navigateTo('/');
+            return;
+        }
+        await getData( "ABC" );
+    })
+   
+    
 
 </script>
 
@@ -77,6 +120,7 @@ import { ref,onMounted } from 'vue';
             padding:16px;
             border: 2px solid black;
             border-radius: 8px;
+            min-height: 700px;
             .editSearchList{
                 display: grid;
                 grid-template-columns: repeat(2,1fr);

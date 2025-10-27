@@ -105,7 +105,7 @@ export const AuthLevelCheck = async() =>{
             const getLevel = await $fetch("/api/authLevelCheck", {
                 method: "GET",
                 headers: {
-                    Authorization: `Bearer ${token}`,  // <- 這才是前端傳給 server 的訊息
+                    Authorization: token,  // <- 這才是前端傳給 server 的訊息
                 },
             });
             return getLevel;

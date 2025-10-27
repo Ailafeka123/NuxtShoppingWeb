@@ -39,14 +39,14 @@ export default defineNuxtPlugin((nuxtApp)=>{
   // 權限等級 1最高 3最低
   const authLevel = ref<boolean>(false)
   onAuthStateChanged(auth,async(u)=>{
-    // 有帳號 抓取上一次登入 超出一小時則進行撐登出，無法判店也是進行登出
+    // 有帳號 抓取上一次登入 超出六小時則進行撐登出，無法判店也是進行登出
     if(u){
       const lastLoginTime = u.metadata.lastSignInTime;
       if(lastLoginTime){
         const lastLoginAt:number = new Date(lastLoginTime).getTime(); // ✅ 轉成毫秒時間戳
         const nowTime: number = Date.now();
         const df = (nowTime - lastLoginAt)/1000/60/60;
-        if(df > 1){
+        if(df > 6){
           signOut(auth);
           user.value = null;
           userId.value = "";
