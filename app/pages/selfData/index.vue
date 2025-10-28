@@ -61,22 +61,8 @@
                         userName:data.userName?data.userName:"",
                         userIcon:data.userIcon?data.userIcon:"",
                         email:data.email,
-                        createTime:data.createTime.toDate().toLocaleDateString('zh-TW', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        }),
-                        lastLogin:data.lastLogin.toDate().toLocaleDateString('zh-TW', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        }),
+                        createTime:changeTime(data.createTime),
+                        lastLogin:changeTime(data.lastLogin),
                     };
                 }else{
                     userError.value = true;

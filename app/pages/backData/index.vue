@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref,onMounted } from 'vue';
-import {auth} from '~/plugins/Authstate.client';
-import type { Timestamp } from 'firebase-admin/firestore'
-// import type { AuthType } from '~/types/auth';
+import type {AuthType} from '~~/types/index'
      // 查詢方式
     type searchMethodType ={
         method:"auth" | "product" | "cart" | "active",
@@ -21,50 +19,25 @@ import type { Timestamp } from 'firebase-admin/firestore'
         limit:10
     })
     // 接收資料
-    // const AuthGetData = ref<authType[]>([]);
+    const AuthGetData = ref<AuthType[]>([]);
 
 
     // 目前進行模式
     const method = ref<"edit"|"create">("edit");
     const getData = async(require:any) =>{
-        if(auth.currentUser){
-            const changeTime = (ts: Timestamp) =>{
-                return ts.toDate().toLocaleDateString('zh-TW', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false  // 24小時制
-                })
-
-            }
-            const token = await auth.currentUser.getIdToken();
+        const token = await AuthToken();
+        if(token.success){
             const data = await $fetch('/api/authEdit/authGetAll',{
                     method: "GET",
                     headers:{
                         DataMethod:require,
-                        Authorization:token,
+                        Authorization:token.message,
                     }    
                 }
             );
-            console.log(data)
-            // if(data){
-            //     AuthGetData.value = data.map( (index:any)=>{
-            //         return(
-            //             {
-            //                 id:index.id,
-            //                 email:index.email ? index.email : "null",
-            //                 usericon:index.usericon ? index.usericon : "",
-            //                 userName:index.userName  ? index.userName : "",
-            //                 lastLogin:index.lastLogin? changeTime(index.lastLogin) : "null",
-            //                 createTime : index.createTime ? changeTime(index.createTime) : "null",
-            //                 userLevel : index.level  ? index.level : "warn!!!!"
-            //             }
-            //         )
-            //     })
-            // }
+            if(data.success){
+                AuthGetData.value = data.message as AuthType[];
+            }
         }
     }
     // 二度確認，避免前端部分被修改

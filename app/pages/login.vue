@@ -9,7 +9,6 @@
             navigateTo('/');
         }else{
             watch(authState,(newVal)=>{
-                console.log(newVal)
                 if(newVal === true){
                     navigateTo('/');
                 }
@@ -84,8 +83,6 @@
 
     // 提交檢驗
     const submitForm = async() =>{
-        console.log(`account = ${account.value}`);
-        console.log(`password = ${password.value}`);
         // 檢查帳號密碼是否有輸入
         if(account.value === ""){
             errorMessage.value = "帳號不得為空";

@@ -1,6 +1,7 @@
 import { adminDb } from '~~/server/lib/firebase';
-
-export default defineEventHandler(async(event)=>{
+import type {AuthType} from '~~/types/index';
+import { changeTime } from '~~/server/lib/composable';
+export default defineEventHandler(async(event):Promise<{success:boolean,message:AuthType[]|string}>=>{
     try{
         const authToken = getHeader(event, "Authorization");
         if (!authToken) throw createError({ statusCode: 401,statusMessage:"未授權"});
@@ -13,18 +14,28 @@ export default defineEventHandler(async(event)=>{
                 headers:{Authorization:authToken}
             }
         )
-        if(checkLevel === false){
+        if(checkLevel.message === false){
             throw new Error("權限不足");
-        }else{
-            const dataList = await adminDb.collection('auth').get();
-            const data = dataList.docs.map(doc=>({
-                id:doc.id,
-                ...doc.data()
-            }))
-            return data;
         }
+        // 進行查詢
+        const dataList = await adminDb.collection('auth').get();
+        const data:AuthType[] = dataList.docs.map(doc=>{
+            const row = doc.data();
+            return{
+                    id:doc.id,
+                    email:row.email,
+                    usericon:row.userIcon,
+                    userName:row.userName,
+                    lastLogin:changeTime(row.lastLogin),
+                    createTime:changeTime(row.createTime),
+                    userLevel:row.level
+            }
+        })
+        return {success:true,message:data};
+        
     }catch(e:any){
         console.error('錯誤訊息: ' ,e);
-        throw createError({ statusCode: 500, statusMessage: e.message });
+        const msg = e instanceof Error? e.message : String(e);
+        return {success:false,message:msg};
     }
 })

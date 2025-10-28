@@ -1,6 +1,6 @@
 import {auth,db} from "~/plugins/Authstate.client";
-import { setDoc, doc, serverTimestamp, updateDoc, deleteDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut ,EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
+import { setDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut ,EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 // 登入並修改最後登入時間
 export const AuthLoading = async(account:string, password:string) =>{
     try{
@@ -60,6 +60,7 @@ export const AuthSignOut = async() =>{
         console.error("登出失敗:", error);
     }
 }
+
 // 二度驗證
 export const AuthCheckPassword = async(email:string,password:string) =>{
     const user = auth.currentUser;
@@ -76,39 +77,60 @@ export const AuthCheckPassword = async(email:string,password:string) =>{
         return false;
     }
 }
-// 丟給後端刪除要求
-export const AuthDelete = async() =>{
+
+// 抓取Auth的Token
+export const AuthToken = async():Promise<{success:boolean,message:string}>  =>{
+    const user = auth.currentUser;
     try{
-        const user = auth.currentUser;
         if(user){
             const token = await user.getIdToken();
+            return {success: true, message:token};
+        }else{
+            throw createError({message:"Auth資訊錯誤"})
+        }
+    }catch(e){
+        const msg = e instanceof Error ? e.message : String(e);
+        return {success:false, message : msg};
+    }
+}
+
+// 丟給後端刪除要求 回傳成功或失敗
+export const AuthDelete = async():Promise<boolean> =>{
+    try{
+        const token = await AuthToken();
+        if(token.success){
             await $fetch("/api/deleteAuth", {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${token}`,  // <- 這才是前端傳給 server 的訊息
+                    Authorization: token.message,  // <- 這才是前端傳給 server 的訊息
                 },
             });
             return true;
         }else{
             return false;
         }
+        
     }catch(e){
         return false;
     }
 }
-// 丟給後端檢查權限
+
+// 丟給後端檢查權限 
 export const AuthLevelCheck = async() =>{
     try{
-        const user = auth.currentUser;
-        if(user){
-            const token = await user.getIdToken();
+        const token = await AuthToken();
+        if(token.success){
             const getLevel = await $fetch("/api/authLevelCheck", {
                 method: "GET",
                 headers: {
-                    Authorization: token,  // <- 這才是前端傳給 server 的訊息
+                    Authorization: token.message,  // <- 這才是前端傳給 server 的訊息
                 },
             });
-            return getLevel;
+            if(getLevel.success === true){
+                return getLevel.message;
+            }else{
+                return false;
+            }
         }else{
             return false;
         }
